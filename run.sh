@@ -8,4 +8,4 @@ CONFIGFILE=$RUN/secrets.json
 
 source $CURRENT/venv/bin/activate
 
-aturan_calendar_bot -c $CONFIGFILE >> /$LOGFILE
+aturan-calendar-bot -c $CONFIGFILE >> /$LOGFILE
