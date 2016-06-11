@@ -44,9 +44,9 @@ def check_posted_today(twitter, today):
 
     last_str = tweets[0]['created_at']
     stripped = ' '.join(last_str.split(' ')[1:])  # arrow doesn't like day-of-week on parsing
-    last = arrow.get(stripped, 'MMM DD HH:mm:ss Z YYYY').floor('day')
+    last = arrow.get(stripped, 'MMM DD HH:mm:ss Z YYYY').to('US/Eastern').floor('day')
 
-    check = arrow.get(today).floor('day')
+    check = arrow.get(today).to('US/Eastern').floor('day')
 
     return last == check
 
