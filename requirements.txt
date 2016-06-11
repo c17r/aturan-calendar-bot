@@ -4,5 +4,3 @@
 pytest
 pytest-cov
 pytest-mock
-
-Fabric3
