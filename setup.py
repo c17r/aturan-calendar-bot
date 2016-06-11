@@ -34,6 +34,7 @@ setup(
         'twitter<1.18.0',
         'voluptuous<0.9.0',
         'aturan-calendar',
+        'logbook',
     ],
     tests_require=[
         'pytest',
