@@ -56,7 +56,7 @@ def deploy():
 
 
 @task
-def clean():
+def prune():
     with settings(sudo_user=server_user):
         with cd('/home/%(server_user)s/run' % env):
-            sudo('current=$(basename $(readlink -f current)) && previous=$(basename $(readlink -f previous)) && for dir in $(ls -dt */ | egrep -v "current|previous|$current|$previous"); do rm -r $dir; done')
+            sudo('[ -h current ] && $(for dir in $(ls -1f | grep -e "/$" | grep -ve "$(readlink previous)\|$(readlink current)"); do rm -r $dir; done) || true')
