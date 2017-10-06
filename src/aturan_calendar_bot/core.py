@@ -1,4 +1,3 @@
-import argparse
 import json
 import logging
 import sys
@@ -8,9 +7,12 @@ import twitter as twapi
 import voluptuous as v
 import logbook
 
+from argparse import ArgumentParser
+
 import aturan_calendar as calendar
 
 _logger = logging.getLogger(__file__)
+
 
 def get_config(path):
     try:
@@ -87,18 +89,11 @@ def post_tweet(twitter, tweet):
     twitter.statuses.update(status=tweet)
 
 
-def handle_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--config-file', '-c',
-        required=True,
-        type=str
-    )
-    parser.add_argument(
-        '--log-file', '-l',
-        type=str
-    )
-    return parser.parse_args()
+def handle_args(sys_args):
+    parser = ArgumentParser()
+    parser.add_argument('--config-file', '-c', required=True, type=str)
+    parser.add_argument('--log-file', '-l', type=str)
+    return parser.parse_args(sys_args)
 
 
 def handle_logging(path):
@@ -121,7 +116,7 @@ def log(log_func, msg):
 
 
 def main():
-    args = handle_args()
+    args = handle_args(sys.argv[1:])
 
     handle_logging(args.log_file)
 

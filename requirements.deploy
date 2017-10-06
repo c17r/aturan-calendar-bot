@@ -1,3 +1,0 @@
---process-dependency-links
-
-git+https://github.com/c17r/aturan-calendar-bot.git#egg=aturan-calendar-bot

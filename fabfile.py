@@ -20,10 +20,11 @@ def live():
 
 @task
 def deploy():
-    local('find . \( -name "*.pyc" -or -name "*.pyo" -or -name "*py.class" \) -delete')
+    local('make clean')
+    local('pipenv run python setup.py sdist bdist_wheel --universal')
 
     local('tar cf %(stamptar)s run.sh' % env)
-    local('tar rf %(stamptar)s requirements.deploy' % env)
+    local('(cd dist && tar rf ../%(stamptar)s *.tar.gz)' % env)
     local('gzip %(stamptar)s' % env)
 
     put(stampzip, '/tmp/%(stampzip)s' % env)
@@ -45,10 +46,10 @@ def deploy():
 
         with cd('/home/%(server_user)s/run/%(stamp)s' % env):
             with shell_env(PATH='/opt/pyenv/bin/:$PATH', PYENV_ROOT='/opt/pyenv'):
-                sudo('virtualenv venv -p $(pyenv prefix 3.5.1)/bin/python' % env)
+                sudo('virtualenv venv -p $(pyenv prefix 3.6.2)/bin/python' % env)
 
             with path('./venv/bin', behavior='prepend'):
-                sudo('pip install --quiet --no-cache-dir -r ./src/requirements.deploy' % env)
+                sudo('pip install --quiet --no-cache-dir ./src/*.tar.gz' % env)
 
         with cd('/home/%(server_user)s/run' % env):
             sudo('ln -nsf $(basename $(readlink -f current)) previous' % env)

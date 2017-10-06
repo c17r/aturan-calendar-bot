@@ -1,6 +1,0 @@
-
--e .
-
-pytest
-pytest-cov
-pytest-mock
