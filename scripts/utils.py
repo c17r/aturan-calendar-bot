@@ -31,6 +31,7 @@ def make_readme(name, repo):
 
 .. end-badges
 '''.format(name=name, repo=repo))
+
         for doc in _get_modules():
             f.write(doc)
             f.write('')
@@ -43,7 +44,7 @@ def make_long_description():
 def _get_modules():
     _, folders, _ = next(os.walk(_SRC))
     for folder in folders:
-        if 'egg-info' not in folder:
+        if 'egg-info' in folder:
             continue
         rv = get_module_string(folder)
         if rv:
@@ -53,7 +54,7 @@ def _get_modules():
 def get_module_string(name):
     init = os.path.join(_SRC, name, '__init__.py')
     try:
-        with open(init, 'r', encoding='utf-8') as f:
+        with open(init, mode='r', encoding='utf-8') as f:
             data = f.read()
         return re.search('\A"""(.*)"""', data, flags=re.S | re.M).group(1)
     except:
