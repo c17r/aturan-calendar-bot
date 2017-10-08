@@ -27,7 +27,7 @@ def make_readme(name, repo):
 
 .. |coveralls| image:: https://coveralls.io/repos/github/{name}/{repo}/badge.svg?branch=master
     :alt: Coverage Status
-    :target: https://coveralls.io/repos/github/{name}/{repo}
+    :target: https://coveralls.io/github/{name}/{repo}
 
 .. end-badges
 '''.format(name=name, repo=repo))
