@@ -16,7 +16,7 @@ coverage: flake
 	@pipenv run py.test -v --cov-report term-missing:skip-covered --cov=.
 
 tox:
-	@pipenv run tox
+	@pipenv run tox --workdir ~/.cache/tox
 
 readme:
 	@pipenv run python -c 'from setup import REPO_USERNAME, NAME; from scripts.utils import make_readme; make_readme(REPO_USERNAME, NAME)'
@@ -28,9 +28,6 @@ clean:
 	@[ -d dist ] && rm -r dist/ || true
 	@[ -f README.rst ] && rm README.rst || true
 	@[ -f .coverage ] && rm .coverage || true
-
-clean-tox: clean
-	@[ -d .tox ] && rm -r .tox/ || true
 
 deploy: clean readme
 	@pipenv run fab live deploy
