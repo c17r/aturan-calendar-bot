@@ -1,26 +1,26 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [packages]
 
-"aturan-calendar" = "*"
+aturan-calendar = "*"
 arrow = "*"
 logbook = "*"
 twitter = "<1.18.0"
 voluptuous = "<0.9.0"
-
-
-
+raven = "*"
 
 
 [dev-packages]
 
 "flake8" = "*"
 pytest = "*"
-"pytest-cov" = "*"
+pytest-cov = "*"
 tox = "*"
-"tox-pyenv" = "*"
-"pytest-pythonpath" = "*"
+tox-pyenv = "*"
+pytest-pythonpath = "*"
 "fabric3" = "*"

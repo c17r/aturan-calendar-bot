@@ -4,7 +4,7 @@ import sys
 from io import StringIO
 from unittest.mock import patch
 
-from aturan_calendar_bot.core import handle_args
+from aturan_calendar_bot.core import handle_args, CmdLineException
 
 
 class StdIOBuffer(StringIO):
@@ -72,7 +72,7 @@ def test_handle_args_missing_config(m_parser):
     log_file = '/a/log.txt'
     m_parser.return_value = ErrorRaisingArgumentParser()
 
-    with pytest.raises(ArgumentParserError):
+    with pytest.raises(CmdLineException):
         rv = handle_args(['-l', log_file])
 
 

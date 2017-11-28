@@ -8,10 +8,15 @@ import voluptuous as v
 import logbook
 
 from argparse import ArgumentParser
+from raven import Client
 
 import aturan_calendar as calendar
 
 _logger = logging.getLogger(__file__)
+
+
+class CmdLineException(Exception):
+    pass
 
 
 def get_config(path):
@@ -19,8 +24,8 @@ def get_config(path):
         with open(path, "r") as f:
             raw = f.read()
         return json.loads(raw)
-    except:
-        return None
+    except Exception as e:
+        raise CmdLineException("Config file can't be loaded: " + str(e))
 
 
 def validate_config(config):
@@ -29,11 +34,12 @@ def validate_config(config):
         v.Required('token_secret'): v.All(v.unicode, v.Length(min=1)),
         v.Required('consumer_key'): v.All(v.unicode, v.Length(min=1)),
         v.Required('consumer_secret'): v.All(v.unicode, v.Length(min=1)),
+        v.Required('sentry_url'): v.unicode,
     })
     try:
         schema(config)
     except v.Error as e:
-        return str(e)
+        raise CmdLineException("Config file invalid: " + str(e))
 
     return None
 
@@ -93,7 +99,10 @@ def handle_args(sys_args):
     parser = ArgumentParser()
     parser.add_argument('--config-file', '-c', required=True, type=str)
     parser.add_argument('--log-file', '-l', type=str)
-    return parser.parse_args(sys_args)
+    try:
+        return parser.parse_args(sys_args)
+    except Exception as e:
+        raise CmdLineException(str(e))
 
 
 def handle_logging(path):
@@ -115,32 +124,56 @@ def log(log_func, msg):
     print(msg)
 
 
-def main():
-    args = handle_args(sys.argv[1:])
+def get_sentry_client(config):
+    return Client(dsn=config['sentry_url'])
 
-    handle_logging(args.log_file)
 
-    config = get_config(args.config_file)
+def sentry_exception(exc, config):
     if config is None:
-        log(_logger.error, "Config file can't be loaded")
-        return -1
+        return
+    if len(config['sentry_url']) == 0:
+        return
+    client = get_sentry_client(config)
+    client.captureException(exc)
 
-    err = validate_config(config)
-    if err is not None:
-        log(_logger.error, err)
-        return -1
 
-    twitter = get_twitter(config)
-    now = arrow.utcnow()
-    if check_posted_today(twitter, now):
-        log(_logger.info, "Tweet already posted for today, exiting...")
+def main(argv):
+    config = None
+
+    try:
+        args = handle_args(argv)
+
+        handle_logging(args.log_file)
+
+        config = get_config(args.config_file)
+        validate_config(config)
+
+        twitter = get_twitter(config)
+        now = arrow.utcnow()
+
+        if check_posted_today(twitter, now):
+            log(_logger.info, "Tweet already posted for today, exiting...")
+            return 0
+
+        tweet = format_tweet(now)
+        post_tweet(twitter, tweet)
+        log(_logger.info, "Tweet posted: " + tweet)
         return 0
-    tweet = format_tweet(now)
-    post_tweet(twitter, tweet)
-    log(_logger.info, "Tweet posted: " + tweet)
 
-    return 0
+    except CmdLineException as e:
+        log(_logger.error, str(e))
+        return -1
+
+    except Exception as e:
+        log(_logger.error, str(e))
+        sentry_exception(e, config)
+        return -2
+
+
+def cli():
+    argv = sys.argv[1:]
+    return main(argv)
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(cli())

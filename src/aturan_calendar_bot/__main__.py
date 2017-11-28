@@ -1,5 +1,5 @@
 import sys
-from .core import main  # noqa
+from .core import cli  # noqa
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(cli())

@@ -25,7 +25,12 @@ URL = 'https://github.com/{0}/{1}'.format(REPO_USERNAME, NAME)
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'aturan-calendar', 'logbook', 'arrow', 'twitter<1.18.0', 'voluptuous<0.9.0'
+    'aturan-calendar',
+    'logbook',
+    'arrow',
+    'twitter<1.18.0',
+    'voluptuous<0.9.0',
+    'raven',
 ]
 
 # The rest you shouldn't have to touch too much :)
