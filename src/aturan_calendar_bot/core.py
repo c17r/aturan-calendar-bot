@@ -9,6 +9,7 @@ import logbook
 
 from argparse import ArgumentParser
 from raven import Client
+from .__version__ import __version__
 
 import aturan_calendar as calendar
 
@@ -30,11 +31,15 @@ def get_config(path):
 
 def validate_config(config):
     schema = v.Schema({
-        v.Required('token'): v.All(v.unicode, v.Length(min=1), v.Match(r'\S+-\S+')),
-        v.Required('token_secret'): v.All(v.unicode, v.Length(min=1)),
-        v.Required('consumer_key'): v.All(v.unicode, v.Length(min=1)),
-        v.Required('consumer_secret'): v.All(v.unicode, v.Length(min=1)),
-        v.Required('sentry_url'): v.unicode,
+        v.Required('twitter'): {
+            v.Required('token'): v.All(v.unicode, v.Length(min=1), v.Match(r'\S+-\S+')),
+            v.Required('token_secret'): v.All(v.unicode, v.Length(min=1)),
+            v.Required('consumer_key'): v.All(v.unicode, v.Length(min=1)),
+            v.Required('consumer_secret'): v.All(v.unicode, v.Length(min=1))
+        },
+        v.Required('sentry'): {
+            v.Required('url'): v.unicode
+        }
     })
     try:
         schema(config)
@@ -45,7 +50,7 @@ def validate_config(config):
 
 
 def get_twitter(config):
-    return twapi.Twitter(auth=twapi.OAuth(**config))
+    return twapi.Twitter(auth=twapi.OAuth(**config['twitter']))
 
 
 def check_posted_today(twitter, today):
@@ -125,13 +130,13 @@ def log(log_func, msg):
 
 
 def get_sentry_client(config):
-    return Client(dsn=config['sentry_url'])
+    return Client(dsn=config['sentry']['url'], release=__version__)
 
 
 def sentry_exception(exc, config):
     if config is None:
         return
-    if len(config['sentry_url']) == 0:
+    if len(config['sentry']['url']) == 0:
         return
     client = get_sentry_client(config)
     client.captureException(exc)

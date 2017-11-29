@@ -107,7 +107,7 @@ if __name__ == '__main__':
         # py_modules=['mypackage'],
 
         entry_points={
-            'console_scripts': ['aturan-calendar-bot=aturan_calendar_bot:main'],
+            'console_scripts': ['aturan-calendar-bot=aturan_calendar_bot:cli'],
         },
         install_requires=REQUIRED,
         include_package_data=True,
